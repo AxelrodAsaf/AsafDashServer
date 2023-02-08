@@ -4,10 +4,12 @@ const mongoose = require("mongoose");
 const authController = require("./Controllers/authController");
 const bodyParser = require("body-parser");
 const cors = require('cors');
+require('dotenv').config()
 
 // Connection to the mongodb server
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb+srv://Asaf:123@cluster0.ytrt7ka.mongodb.net/Dashboard?retryWrites=true&w=majority", {})
+const mongooseURL = process.env.REACT_APP_MONGOOSE_URL;
+mongoose.connect(mongooseURL, {})
     .then(() => console.log("Connected to monbodb successfully."))
     .catch(error => {
         console.log("There was an error.");
