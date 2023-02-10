@@ -1,16 +1,19 @@
-const User = require("../models/User")
-const bcrypt = require('bcrypt')
+const User = require("../models/User");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-
+// Secret key for signing JWT
+const secretKey = process.env.JWT_SECRET_KEY;
 
 // Define and export the function 'signup'
 exports.signup = (req, res) => {
-    const { firstName, email, password } = req.body;
+    const { firstName, lowerEmail, password } = req.body;
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
-    const newUser = new User({ firstName: firstName, email: email, password: hash });
+    const newUser = new User({ firstName: firstName, email: lowerEmail, password: hash });
 
-    console.log(`Attempting to save newUser: ${newUser}`)
+    console.log(`Attempting to save newUser: ${newUser}`);
 
     newUser.save((err) => {
         if (err) {
@@ -26,27 +29,44 @@ exports.signup = (req, res) => {
 }
 
 // Define and export the function 'login'
-// exports.login = (req, res) => {
-//     User.findOne({
-//         email: req.body.email,
-//         password: req.body.password
-//     },
-//         (error, user) => {
-//             // Found the user
-//             if (user &&
-//                 (user.email === req.body.email) &&
-//                 (user.password === req.body.password)) {
-//                 res.status(200).json({ message: "Congrats! You're signed in now." })
-//             } else if (!error) {
-//                 // Didn't find the user
-//                 res.status(401).json({ message: "Wrong user credentials." })
-//                 console.log("Wrong user credentials")
-//             } else {
-//                 // Another error
-//                 res.status(500).send(error)
-//                 console.log("Internal server error")
-//             }
-//         }
-//     )
-// }
+exports.login = async (req, res) => {
+    email = req.body.lowerLoginEmail;
+    cleanPassword = req.body.loginPass;
+    
+    // Find a user with the given email
+    const user = await User.findOne({ email })
+    if (user) {
+        // Check if the password is correct
+        const isMatch = bcrypt.compareSync(cleanPassword, user.password);
+        if (isMatch) {
+            // Password is correct
+            const payload = {
+                email: user.email,
+            }
+            const token = jwt.sign(payload, secretKey);
+            res.status(200).json({ token: token, firstName: user.firstName, email: user.email });
+        }
+    }
+    // User not found
+    else {
+        console.log(`User not found`);
+        return res.status(400).json({ message: "User not found." })
+    }
+}
 
+exports.token = async (req, res) => {
+    // Verify token
+    var payload = '';
+    const token = req.headers.authorization.split(" ")[1];
+    try {
+        // Verify the JWT
+        payload = jwt.verify(token, secretKey);
+        // Access the payload of the JWT
+        console.log(payload);
+        res.status(200).json({ message: "Token verified"});
+    } catch (error) {
+        // Handle error
+        console.error(error.message);
+        res.status(401).json({ message: "Unauthorized" });
+    }
+}
