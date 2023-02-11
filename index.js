@@ -22,10 +22,12 @@ app.use(bodyParser.json());
 // Permit all to send/receive data
 app.use(cors());
 
+// Using app.use make sure that the token is valid for all requests
+app.use(authController.token);
+
 // When the client tries to react a certain '/XXX' call a function (authController.XXX)
 app.post("/signup", authController.signup)
 app.post("/login", authController.login)
-app.get("/token", authController.token)
 
 // Run the server on port 8000 with a console.log to tell the backend "developer"
 app.listen(8000, () => console.log("Starting connection to port 8000."));

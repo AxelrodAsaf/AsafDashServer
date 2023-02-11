@@ -46,6 +46,10 @@ exports.login = async (req, res) => {
             const token = jwt.sign(payload, secretKey);
             res.status(200).json({ token: token, firstName: user.firstName, email: user.email });
         }
+        // Password is incorrect
+        else {
+            return res.status(401).json({ message: "Incorrect password" });
+        }
     }
     // User not found
     else {
@@ -54,19 +58,28 @@ exports.login = async (req, res) => {
     }
 }
 
-exports.token = async (req, res) => {
-    // Verify token
-    var payload = '';
-    const token = req.headers.authorization.split(" ")[1];
-    try {
-        // Verify the JWT
-        payload = jwt.verify(token, secretKey);
-        // Access the payload of the JWT
-        console.log(payload);
-        res.status(200).json({ message: "Token verified"});
-    } catch (error) {
-        // Handle error
-        console.error(error.message);
-        res.status(401).json({ message: "Unauthorized" });
+// 1. When the client sends a get request to '/token' reply with "Token verified" after verification
+// 2. When the client makes any request to the server, check if the token is valid
+exports.token = async (req, res, next) => {
+    
+    if (req.headers.authorization !== undefined) {
+        [, token] = req.headers.authorization.split(' ');
+        // Verify token
+        if (token !== undefined) {
+            var payload = '';
+            try {
+                // Verify the JWT
+                payload = jwt.verify(token, secretKey);
+                // Access the payload of the JWT
+                console.log(payload);
+                // Add the user's email (from the token) to the request
+                req.user = payload.email;
+            } catch (error) {
+                // Handle error
+                console.error(error.message);
+            }
+        }
     }
+    // Continue to the next handler (with or without the user's email)
+    next();
 }
