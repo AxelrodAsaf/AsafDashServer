@@ -26,8 +26,11 @@ app.use(cors());
 app.use(authController.token);
 
 // When the client tries to react a certain '/XXX' call a function (authController.XXX)
-app.post("/signup", authController.signup)
-app.post("/login", authController.login)
+app.post("/signup", authController.signup);
+app.post("/login", authController.login);
+
+// When the client tries to call '/news' with a GET request, call a function (newsController.getNews)
+app.get("/getInfo", authController.getInfo);
 
 // Run the server on port 8000 with a console.log to tell the backend "developer"
 app.listen(8000, () => console.log("Starting connection to port 8000."));
