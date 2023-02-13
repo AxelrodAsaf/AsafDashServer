@@ -29,8 +29,11 @@ app.use(authController.token);
 app.post("/signup", authController.signup);
 app.post("/login", authController.login);
 
-// When the client tries to call '/news' with a GET request, call a function (newsController.getNews)
-app.get("/getInfo", authController.getInfo);
+// When the client tries to call '/getInfo' with a GET request, call a function (newsController.getInfo)
+app.get("/getInfo/:topic", authController.getInfo);
+
+// When the client tries to call 'updateInfo' with a PUT request, call a function (newsController.updateInfo)
+app.put("/updateInfo", authController.updateInfo);
 
 // Run the server on port 8000 with a console.log to tell the backend "developer"
 app.listen(8000, () => console.log("Starting connection to port 8000."));

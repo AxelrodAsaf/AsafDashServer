@@ -18,7 +18,7 @@ exports.signup = (req, res) => {
     newUser.save((err) => {
         if (err) {
             if (err.code === 11000) { // Duplicate Key
-                return res.status(409).json({message: err});
+                return res.status(409).json({ message: err });
             }
             else { // Different error
                 return res.status(500).json({ message: err });
@@ -62,7 +62,6 @@ exports.login = async (req, res) => {
 // 1. When the client sends a get request to '/token' reply with "Token verified" after verification
 // 2. When the client makes any request to the server, check if the token is valid
 exports.token = async (req, res, next) => {
-
     if (req.headers.authorization !== undefined) {
         [, token] = req.headers.authorization.split(' ');
         // Verify token
@@ -96,7 +95,7 @@ exports.getInfo = async (req, res) => {
         // Using the email given in the request, find the user
         try {
             const user = await User.findOne({ email: req.user });
-            var topic = req.headers.topic;
+            topic = req.params.topic;
             topic = topic.toLowerCase();
             const result = user[topic];
             // Send the result array to the client
@@ -109,3 +108,40 @@ exports.getInfo = async (req, res) => {
         }
     }
 }
+
+// When the client calls '/updateInfo' using the 'POST' method, the server updates the data in the database
+exports.updateInfo = async (req, res) => {
+    // If there isn't a user's email in the request, return an error
+    if (req.user === undefined) {
+        res.status(404).json({ message: "No user found" });
+    }
+    // If an email is in the request, try to find the user in the database
+    else {
+        // Using the email given in the request, find the user
+        try {
+            const user = await User.findOne({ email: req.user });
+            // Define the variable named 'topic' from the body of the request
+            var topic = req.headers.topic;
+            topic = topic.toLowerCase();
+            var updateArray = req.headers.updatearray.split(',').map(s => s.trim().toLowerCase());
+            // Update the database with the array 'updateArray' under the key 'topic'
+            user[topic] = updateArray;
+            // Save the user to the database
+            user.save((err) => {
+                if (err) {
+                    return res.status(500).json({ message: err.message });
+                }
+                else {
+                    console.log(user);
+                    return res.status(200).json(user);
+                }
+            });
+        }
+        // There was an email in the request, but the user was not found in the database, or another error occurred
+        catch (error) {
+            console.error(error.message);
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+
