@@ -87,7 +87,7 @@ exports.token = async (req, res, next) => {
 // When the client calls '/getInfo' using the 'GET' method, the server responds with a JSON array of all the relevant info from the database
 exports.getInfo = async (req, res) => {
     // If there isn't a user's email in the request, find the 'default' user in the database
-    if (req.user === undefined) {
+    if (req.headers.user === undefined) {
         // Find the 'default' user in the database
         const user = await User.findOne({ email: 'default' });
         topic = req.params.topic;
@@ -101,7 +101,7 @@ exports.getInfo = async (req, res) => {
     else {
         // Using the email given in the request, find the user
         try {
-            const user = await User.findOne({ email: req.user });
+            const user = await User.findOne({ email: req.headers.user });
             topic = req.params.topic;
             const lowerTopic = topic.toLowerCase();
             const result = user[lowerTopic];
