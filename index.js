@@ -10,7 +10,10 @@ require('dotenv').config()
 mongoose.set("strictQuery", false);
 const mongooseURL = process.env.REACT_APP_MONGOOSE_URL;
 mongoose.connect(mongooseURL, {})
-    .then(() => console.log("Connected to monbodb successfully."))
+.then(() => {
+    console.log("Connected to monbodb successfully.");
+    console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
+    })
     .catch(error => {
         console.log("There was an error.");
         console.log(error);
@@ -36,7 +39,10 @@ app.get("/getInfo/:topic", authController.getInfo);
 app.put("/updateInfo", authController.updateInfo);
 
 // Run the server on port 8000 with a console.log to tell the backend "developer"
-app.listen(8000, () => console.log("Starting connection to port 8000."));
+app.listen(8000, () => {
+    console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
+    console.log("Starting connection to port 8000.");
+});
 
 
 // ++++++++++++++++++ Console.log() commands to change colors of the output: ++++++++++++++++++

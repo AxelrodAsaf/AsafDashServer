@@ -44,7 +44,7 @@ exports.login = async (req, res) => {
                 email: user.email,
             }
             const token = jwt.sign(payload, secretKey);
-            console.log(`${email} logged in with token: ${token}`);
+            console.log('\x1b[32m%s\x1b[0m', `${email} logged in with token: ${token}`);
             res.status(200).json({ token: token, firstName: user.firstName, email: user.email });
         }
         // Password is incorrect
@@ -80,9 +80,13 @@ exports.token = async (req, res, next) => {
             }
         }
     }
+    else {
+        console.log('\x1b[31m%s\x1b[0m', `No token verified for the request`);
+    }
     // Continue to the next handler (with or without the user's email)
     next();
 }
+
 
 // When the client calls '/getInfo' using the 'GET' method, the server responds with a JSON array of all the relevant info from the database
 exports.getInfo = async (req, res) => {
@@ -95,10 +99,12 @@ exports.getInfo = async (req, res) => {
         const result = user[topic];
         // Send the default data to the client
         console.log(`\x1b[35m%s\x1b[0m`, `'${topic}' default data sent to a user`);
-        res.status(200).json(result);
+        res.status(200).json(topicArray.default);
     }
+
     // If an email is in the request, try to find the user in the database and retrieve the news array
     else {
+
         // Using the email given in the request, find the user
         try {
             const user = await User.findOne({ email: req.headers.user });
@@ -106,13 +112,21 @@ exports.getInfo = async (req, res) => {
             const lowerTopic = topic.toLowerCase();
             const result = user[lowerTopic];
             // Send the result array to the client
-            console.log(`\x1b[35m%s\x1b[0m`, `'${lowerTopic}' sent to '${user.email}'`);
+            console.log(`\x1b[35m%s\x1b[0m`, `'${topic}' sent to '${user.email}'`);
+            console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
             res.status(200).json(result);
         }
         // There was an email in the request, but the user was not found in the database, or another error occurred
         catch (error) {
-            console.error(error.message);
-            res.status(error.status).json({ message: error.message });
+            // Get the default user from the User Schema (to return default data)
+            const defaultUser = User.schema.obj;
+            topic = req.params.topic.toLowerCase();
+            const topicArray = defaultUser[topic];
+
+            // Send the default data to the client
+            console.log(`\x1b[35m%s\x1b[0m`, `'${topic}' default data sent to a user`);
+            console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
+            res.status(200).json(topicArray);
         }
     }
 }
