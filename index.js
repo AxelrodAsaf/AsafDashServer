@@ -25,12 +25,12 @@ app.use(bodyParser.json());
 // Permit all to send/receive data
 app.use(cors());
 
-// Using app.use make sure that the token is valid for all requests
-app.use(authController.token);
-
 // When the client tries to react a certain '/XXX' call a function (authController.XXX)
 app.post("/signup", authController.signup);
 app.post("/login", authController.login);
+
+// Using app.use make sure that the token is valid for all requests
+app.use(authController.token);
 
 // When the client tries to call '/getInfo' with a GET request, call a function (newsController.getInfo)
 app.get("/getInfo/:topic", authController.getInfo);
