@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const authController = require("./Controllers/authController");
+const userData = require("./Controllers/userData");
 const bodyParser = require("body-parser");
 const cors = require('cors');
 require('dotenv').config()
@@ -32,11 +33,11 @@ app.post("/login", authController.login);
 // Using app.use make sure that the token is valid for all requests
 app.use(authController.token);
 
-// When the client tries to call '/getInfo' with a GET request, call a function (newsController.getInfo)
-app.get("/getInfo/:topic", authController.getInfo);
+// When the client tries to call '/getInfo' with a GET request, call a function (userData.getInfo)
+app.get("/getInfo/:topic", userData.getInfo);
 
-// When the client tries to call 'updateInfo' with a PUT request, call a function (newsController.updateInfo)
-app.put("/updateInfo", authController.updateInfo);
+// When the client tries to call 'updateInfo' with a PUT request, call a function (userData.updateInfo)
+app.put("/updateInfo", userData.updateInfo);
 
 // Run the server on port 8000 with a console.log to tell the backend "developer"
 app.listen(8000, () => {
