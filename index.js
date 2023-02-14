@@ -7,13 +7,14 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 require('dotenv').config()
 
+
 // Connection to the mongodb server
 mongoose.set("strictQuery", false);
 const mongooseURL = process.env.REACT_APP_MONGOOSE_URL;
 mongoose.connect(mongooseURL, {})
-.then(() => {
-    console.log("Connected to monbodb successfully.");
-    console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
+    .then(() => {
+        console.log("Connected to monbodb successfully.");
+        console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
     })
     .catch(error => {
         console.log("There was an error.");

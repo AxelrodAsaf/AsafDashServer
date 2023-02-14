@@ -1,6 +1,5 @@
 const User = require("../models/User");
 
-
 // When the client calls '/getInfo' using the 'GET' method, the server responds with a JSON array of all the relevant info from the database
 exports.getInfo = async (req, res) => {
   var topicArray = [];

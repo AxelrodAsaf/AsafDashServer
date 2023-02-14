@@ -86,4 +86,3 @@ exports.token = async (req, res, next) => {
     // Continue to the next handler (with or without the user's email)
     next();
 }
-
