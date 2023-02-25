@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const authController = require("./Controllers/authController");
 const userData = require("./Controllers/userData");
 const bodyParser = require("body-parser");
+const port = 8000;
 const cors = require('cors');
 require('dotenv').config()
 
@@ -25,7 +26,7 @@ mongoose.connect(mongooseURL, {})
 app.use(bodyParser.json());
 
 // Permit all to send/receive data
-app.use(cors());
+app.use(cors("*"));
 
 // When the client tries to react a certain '/XXX' call a function (authController.XXX)
 app.post("/signup", authController.signup);
@@ -40,10 +41,10 @@ app.get("/getInfo/:topic", userData.getInfo);
 // When the client tries to call 'updateInfo' with a PUT request, call a function (userData.updateInfo)
 app.put("/updateInfo", userData.updateInfo);
 
-// Run the server on port 8000 with a console.log to tell the backend "developer"
-app.listen(8000, () => {
+// Run the server on port with a console.log to tell the backend "developer"
+app.listen(port, () => {
     console.log('\x1b[32m%s\x1b[0m', `+----------------------------+`);
-    console.log("Starting connection to port 8000.");
+    console.log(`Starting connection to port ${port}.`);
 });
 
 
