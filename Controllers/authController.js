@@ -43,7 +43,8 @@ exports.login = async (req, res) => {
             const payload = {
                 email: user.email,
             }
-            const token = jwt.sign(payload, secretKey);
+            var token = jwt.sign(payload, secretKey);
+            token = `Bearer ${token}`;
             console.log('\x1b[32m%s\x1b[0m', `${email} logged in with token: ${token}`);
             res.status(200).json({ token: token, firstName: user.firstName, email: user.email });
         }
