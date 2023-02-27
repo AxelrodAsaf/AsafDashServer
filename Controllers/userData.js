@@ -3,6 +3,8 @@ const User = require("../models/User");
 // When the client calls '/getInfo' using the 'GET' method, the server responds with a JSON array of all the relevant info from the database
 exports.getInfo = async (req, res) => {
   var topicArray = [];
+  var userObject = {};
+
   // If there isn't an email in the request...
   if (req.user === undefined) {
 
@@ -17,6 +19,8 @@ exports.getInfo = async (req, res) => {
     if (topicArray !== undefined) {
       topicArray = topicArray.default
     }
+
+    userObject = { email: null, ...defaultUser };
   }
 
   // If an email is in the request, try to find the user in the database and retrieve the news array
@@ -27,6 +31,7 @@ exports.getInfo = async (req, res) => {
       const user = await User.findOne({ email: req.user });
       topic = req.params.topic.toLowerCase();
       topicArray = user[topic];
+      userObject = user;
     }
 
     // There was an email in the request, but the user was not found in the database, or another error occurred
@@ -38,6 +43,7 @@ exports.getInfo = async (req, res) => {
       if (topicArray !== undefined) {
         topicArray = topicArray.default
       }
+      userObject = { email: req.user, ...defaultUser };
     }
   }
 
@@ -48,10 +54,11 @@ exports.getInfo = async (req, res) => {
     return res.status(404).json({ message: "Topic not found" });
   }
 
-  // Send the default data to the client
-  console.log(`\x1b[35m%s\x1b[0m`, `'${topic}' default data sent to a user`);
-  res.status(200).json(topicArray);
+  // Send the data to the client
+  console.log(`\x1b[35m%s\x1b[0m`, `'${topic}' data sent to user: '${req.user}'`);
+  res.status(200).json({ user: userObject, topicData: topicArray });
 }
+
 
 
 
@@ -74,7 +81,7 @@ exports.updateInfo = async (req, res) => {
   topic = topic.toLowerCase();
 
   // Retrieve the 'updateArray' variable from the request body
-  const updateArray = req.body.updateArray;
+  const updateArray = req.body.data[topic];
   if ((updateArray === undefined) || (updateArray.length === 0)) {
     console.error("No updateArray in the request while trying to update info");
     return res.status(400).json({ message: "No updateArray specified" });
@@ -84,9 +91,10 @@ exports.updateInfo = async (req, res) => {
   try {
     // Find the user in the database using their email
     const user = await User.findOne({ email: req.user });
+    topic = topic.toLowerCase();
 
     // Update the user's data in the database with the new 'updateArray' array under the key 'topic'
-    user[topic] = updateArray.map(s => s.trim());
+    user[topic] = updateArray;
 
     // Save the user to the database
     user.save((err) => {
