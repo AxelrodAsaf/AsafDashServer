@@ -26,7 +26,7 @@ mongoose.connect(mongooseURL, {})
 app.use(bodyParser.json());
 
 // Permit all to send/receive data
-app.use(cors("*"));
+app.use(cors("*", "https://asafdash.netlify.app/"));
 
 // When the client tries to react a certain '/XXX' call a function (authController.XXX)
 app.post("/signup", authController.signup);
