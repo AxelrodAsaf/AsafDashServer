@@ -59,9 +59,6 @@ exports.getInfo = async (req, res) => {
   res.status(200).json({ user: userObject, topicData: topicArray });
 }
 
-
-
-
 // When the client calls '/updateInfo' using the 'POST' method, the server updates the data in the database
 exports.updateInfo = async (req, res) => {
   // If there isn't a user's email in the request, return an error

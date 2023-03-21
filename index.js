@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const authController = require("./Controllers/authController");
 const userData = require("./Controllers/userData");
+const newsController = require("./Controllers/newsController");
 const bodyParser = require("body-parser");
 const port = 8000;
 const cors = require('cors');
@@ -38,8 +39,11 @@ app.use(authController.token);
 // When the client tries to call '/getInfo' with a GET request, call a function (userData.getInfo)
 app.get("/getInfo/:topic", userData.getInfo);
 
-// When the client tries to call 'updateInfo' with a PUT request, call a function (userData.updateInfo)
+// When the client tries to call '/updateInfo' with a PUT request, call a function (userData.updateInfo)
 app.put("/updateInfo", userData.updateInfo);
+
+// When the client tries to call '/getNews' with a GET request, call a function (userData.getNews)
+app.get("/getNews", newsController.getNews);
 
 // Run the server on port with a console.log to tell the backend "developer"
 app.listen(port, () => {
