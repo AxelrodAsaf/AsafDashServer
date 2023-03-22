@@ -2,10 +2,6 @@ const axios = require('axios');
 
 exports.getNews = function (req, res) {
 
-  const realUser = req.user;
-  if (!realUser) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
   // The user needs to send:
   // Search input
   const userSearch = req.body.searchInput;
