@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: ['www.google.com', 'www.facebook.com', 'www.linkedin.com', 'www.youtube.com', 'www.instagram.com', 'www.reddit.com']
     }
-})
+},{timeseries: true});
 
 // Export the schema
 module.exports = mongoose.model("User", userSchema)
