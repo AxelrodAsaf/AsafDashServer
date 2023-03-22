@@ -43,7 +43,7 @@ app.get("/getInfo/:topic", userData.getInfo);
 app.put("/updateInfo", userData.updateInfo);
 
 // When the client tries to call '/getNews' with a GET request, call a function (userData.getNews)
-app.get("/getNews", newsController.getNews);
+app.post("/getNews", newsController.getNews);
 
 // Run the server on port with a console.log to tell the backend "developer"
 app.listen(port, () => {
