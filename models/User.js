@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     externallinks: {
         type: Array,
         default: ['www.google.com', 'www.facebook.com', 'www.linkedin.com', 'www.youtube.com', 'www.instagram.com', 'www.reddit.com']
+    },
+    lastTokenVerif: {
+        type: Object,
+        default: {}
     }
 },{timeseries: true});
 

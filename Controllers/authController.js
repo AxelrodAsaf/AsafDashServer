@@ -75,9 +75,22 @@ exports.token = async (req, res, next) => {
                 console.log('\x1b[32m%s\x1b[0m', `Verified token of user: ${payload.email}`);
                 // Add the user's email (from the token) to the request
                 req.user = payload.email;
+                // Add last request date to the user's object in the database
+                const user = await User.findOne({ email: payload.email });
+                if (user) {
+                    const now = new Date();
+                    const today = now.toLocaleDateString();
+                    if (user.lastTokenVerif && user.lastTokenVerif[today]) {
+                        user.lastTokenVerif[today] = user.lastTokenVerif[today] + 1;
+                    } else {
+                        user.lastTokenVerif[today] = 1;
+                    }
+                    user.markModified('lastTokenVerif');
+                    await user.save();
+                }
             } catch (error) {
                 // Handle error
-                console.error(error.message);
+                console.error("Token varification error:" + error.message);
             }
         }
     }
