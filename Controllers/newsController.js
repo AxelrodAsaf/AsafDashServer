@@ -20,14 +20,17 @@ exports.getNews = function (req, res) {
 
   // The server needs to do:
   // Format today's date properly: "YYYY-MM-DD"
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() - 1);
+  let currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - 1); // subtract 1 day
+  let formattedDate = formatDate(currentDate);
 
-  const year = currentDate.getFullYear();
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-  const day = currentDate.getDate().toString().padStart(2, '0');
-  const formattedDate = `${year}-${month}-${day}`;
-
+  // Define a function to format a date object into a string in "YYYY-MM-DD" format
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   // Swap between API keys if needed
   let currentKeyIndex = 0;
@@ -45,6 +48,13 @@ exports.getNews = function (req, res) {
     "&sortBy=popularity&apiKey=" +
     `${getNextNewsKey()}`;
 
+  // Define a function to get the previous day's date in "YYYY-MM-DD" format
+  function getPreviousDay() {
+    let currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 1); // subtract 1 day
+    return formatDate(currentDate);
+  }
+
   // Set the attempt count to 0
   let newsAPITries = 0;
 
@@ -54,7 +64,7 @@ exports.getNews = function (req, res) {
       try {
         // Make the request (userSearch, formattedDate, and getNextNewsKey are included already)
         const response = await axios.get(searchUrl);
-        return response.data.articles;
+        return response.data.articles.length > 0 ? response.data.articles : await tryPreviousDay();
       } catch (err) {
         newsAPITries++;
         searchUrl = searchUrl.replace(apiKeys[currentKeyIndex], getNextNewsKey());
@@ -63,6 +73,25 @@ exports.getNews = function (req, res) {
     } else {
       console.error(`AsafError: Error with search attempts. Response says too many requests.`);
       return res.status(500).json({ error: "Too many requests" });
+    }
+  }
+
+  // Define a function to try the previous day's date if there are no articles
+  async function tryPreviousDay() {
+    const previousDay = getPreviousDay();
+    const previousSearchUrl = "https://newsapi.org/v2/everything?q=" +
+      `${userSearch}` +
+      "&language=en&from=" +
+      `${previousDay}` +
+      "&sortBy=popularity&apiKey=" +
+      `${getNextNewsKey()}`;
+
+    try {
+      const response = await axios.get(previousSearchUrl);
+      return response.data.articles;
+    } catch (err) {
+      newsAPITries++;
+      return tryPreviousDay();
     }
   }
 
