@@ -59,6 +59,38 @@ exports.getInfo = async (req, res) => {
   res.status(200).json({ user: userObject, topicData: topicArray });
 }
 
+// When the client calls '/getInfo' using the 'GET' method, the server responds with a JSON array of all the relevant info from the database
+exports.getAllInfo = async (req, res) => {
+  var userObject = {};
+
+  // If there isn't an email in the request...
+  if (req.user === undefined) {
+    // Get the default user from the User Schema
+    const defaultUser = User.schema.obj;
+    userObject = { email: null, ...defaultUser };
+  }
+
+  // If an email is in the request, try to find the user in the database and retrieve the news array
+  else {
+    // Using the email given in the request, find the user
+    try {
+      const user = await User.findOne({ email: req.user });
+      userObject = user;
+    }
+
+    // There was an email in the request, but the user was not found in the database, or another error occurred
+    catch (error) {
+      // Get the default user from the User Schema (to return default data)
+      const defaultUser = User.schema.obj;
+      userObject = { email: req.user, ...defaultUser };
+    }
+  }
+
+  // Send the data to the client
+  console.log(`\x1b[35m%s\x1b[0m`, `User data sent to user: '${req.user}'`);
+  res.status(200).json({ user: userObject });
+}
+
 // When the client calls '/updateInfo' using the 'POST' method, the server updates the data in the database
 exports.updateInfo = async (req, res) => {
   // If there isn't a user's email in the request, return an error
@@ -69,8 +101,6 @@ exports.updateInfo = async (req, res) => {
 
   // Retrieve the 'topic' variable from the request headers
   var topic = req.headers.topic;
-
-  // Check to see if there is a topic in the request headers
   if (topic === undefined) {
     console.error("No topic in the request while trying to update info");
     return res.status(400).json({ message: "No topic specified" });
@@ -78,10 +108,16 @@ exports.updateInfo = async (req, res) => {
   topic = topic.toLowerCase();
 
   // Retrieve the 'updateArray' variable from the request body
-  const updateArray = req.body.data[topic];
+  let updateArray = req.body.data[topic];
+  console.log(updateArray);
   if ((updateArray === undefined) || (updateArray.length === 0)) {
-    console.error("No updateArray in the request while trying to update info");
-    return res.status(400).json({ message: "No updateArray specified" });
+    if (topic !== 'todolist') {
+      console.error("No updateArray in the request while trying to update info");
+      return res.status(400).json({ message: "No updateArray specified" });
+    }
+    // Get the default user from the User Schema
+    const defaultUser = User.schema.obj;
+    updateArray = defaultUser.todolist.default;
   }
 
 

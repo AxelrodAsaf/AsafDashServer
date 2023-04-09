@@ -39,6 +39,9 @@ app.use(authController.token);
 // When the client tries to call '/getInfo' with a GET request, call a function (userData.getInfo)
 app.get("/getInfo/:topic", userData.getInfo);
 
+// When the client tries to call '/getAllInfo' with a GET request, call a function (userData.getAllInfo)
+app.get("/getAllInfo", userData.getAllInfo);
+
 // When the client tries to call '/updateInfo' with a PUT request, call a function (userData.updateInfo)
 app.put("/updateInfo", userData.updateInfo);
 
