@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: ['Seattle', 'Tel Aviv', 'New York', 'Los Angeles', 'Chicago', 'Paris', 'London', 'Paris', 'Berlin', 'Tokyo']
     },
+    todolist: {
+        type: Array,
+        default: ['List Item 1', 'List Item 2', 'List Item 3']
+    },
     externallinks: {
         type: Array,
         default: ['www.google.com', 'www.facebook.com', 'www.linkedin.com', 'www.youtube.com', 'www.instagram.com', 'www.reddit.com']
